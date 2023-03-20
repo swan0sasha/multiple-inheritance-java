@@ -1,34 +1,38 @@
 public class TargetCode {
 
-    public class A extends MIRoot {
+    public static class A extends MIRoot {
         public void print() {
-            System.out.println("Print from A");
+            System.out.println("\nPrint from A");
         }
     }
 
     @Extends(parents = A.class)
-    public class B extends MIRoot {
+    public static class B extends MIRoot {
         public void print() {
-            System.out.println("Print from B");
+            System.out.println("\nPrint from B");
             callNextMethod("print");
         }
     }
 
     @Extends(parents = A.class)
-    public class C extends MIRoot {
+    public static class C extends MIRoot {
         public void print() {
-            System.out.println("Print from C");
+            System.out.println("\nPrint from C");
         }
     }
 
-    public class E extends MIRoot {
+    public static class E extends MIRoot {
     }
 
     @Extends(parents = {B.class, C.class})
     public static class D extends MIRoot {
         public void print() {
-            System.out.println("Print from D");
+            System.out.println("\nPrint from D");
             callNextMethod("print");
+        }
+
+        public void simplePrint() {
+            System.out.println("\nPrint from D");
         }
     }
 
