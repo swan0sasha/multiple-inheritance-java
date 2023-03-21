@@ -33,10 +33,7 @@ public class MIRoot {
         }
 
         classesQueue = new ArrayDeque<>();
-        Class<?>[] argumentTypes = new Class[arguments.length];
-        for (int i = 0; i < arguments.length; i++) {
-            argumentTypes[i] = arguments[i].getClass();
-        }
+        Class<?>[] argumentTypes = getArgumentTypes(arguments);
         throw new NoSuchMethodException("No method \"" + methodName + "(" + Arrays.toString(argumentTypes) + ")\" in hierarchy!");
     }
 
@@ -58,6 +55,14 @@ public class MIRoot {
         return c.getAnnotation(Extends.class).parents();
     }
 
+    private Class<?>[] getArgumentTypes(Object... arguments) {
+        Class<?>[] argumentTypes = new Class[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            argumentTypes[i] = arguments[i].getClass();
+        }
+        return argumentTypes;
+    }
+
     private boolean hasNextMethod(String methodName, Object... arguments) {
         if (classesQueue.isEmpty()) {
             return false;
@@ -65,10 +70,7 @@ public class MIRoot {
 
         Class<?> parent = classesQueue.peek();
 
-        Class<?>[] argumentTypes = new Class[arguments.length];
-        for (int i = 0; i < arguments.length; i++) {
-            argumentTypes[i] = arguments[i].getClass();
-        }
+        Class<?>[] argumentTypes = getArgumentTypes(arguments);
 
         try {
             parent.getMethod(methodName, argumentTypes);
@@ -86,7 +88,7 @@ public class MIRoot {
     }
 
     private Object invokeNextMethod(String methodName, Object... arguments) {
-        Class<?>[] argumentTypes = new Class[arguments.length];
+        Class<?>[] argumentTypes = getArgumentTypes(arguments);
         Class<?> parent = classesQueue.pop();
 
         Method method;

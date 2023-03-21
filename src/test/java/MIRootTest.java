@@ -45,5 +45,17 @@ public class MIRootTest {
         Assertions.assertThrows(MultipleInheritanceException.class, () -> g.callNextMethod("name"));
     }
 
+    @Test
+    public void methodWithArguments() throws NoSuchMethodException, MultipleInheritanceException {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("Cd", d.callNextMethod("string", "d"));
+    }
+
+    @Test
+    public void callNonexistentMethodWithArguments() {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertThrows(NoSuchMethodException.class, () -> d.callNextMethod("string"));
+        //method "string" in class C needs one String argument
+    }
 
 }

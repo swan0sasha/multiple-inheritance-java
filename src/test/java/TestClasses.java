@@ -51,6 +51,10 @@ public class TestClasses {
         public String name() {
             return "C";
         }
+
+        public String string(String s) {
+            return "C".concat(s);
+        }
     }
 
     @Extends(parents = {B.class, C.class})
