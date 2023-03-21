@@ -2,7 +2,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Deque;
 
 public class MIRoot {
@@ -15,23 +15,77 @@ public class MIRoot {
         }
     }
 
-    public void callNextMethod(String methodName, Object... arguments) {
-
-        if (this.getClass().getAnnotations().length == 0 ||
-                this.getClass().getAnnotation(Extends.class) == null) {
-            return;
+    public Object callNextMethod(String methodName, Object... arguments) throws NoSuchMethodException, MultipleInheritanceException {
+        Class<?>[] parents = getParents(this.getClass());
+        if (parents == null) {
+            throw new MultipleInheritanceException("No parent class to call for next method.");
         }
 
-        Class<?>[] parents = this.getClass().getAnnotation(Extends.class).parents();
-        Collections.addAll(classesQueue, parents);
+        addSuperClassesToQueue(parents);
 
-        while (!classesQueue.isEmpty() && !invokeNextMethod(methodName, arguments)) {
+
+        while (!classesQueue.isEmpty()) {
+            if (hasNextMethod(methodName, arguments)) {
+                Object res = invokeNextMethod(methodName, arguments);
+                classesQueue = new ArrayDeque<>();
+                return res;
+            }
         }
 
         classesQueue = new ArrayDeque<>();
+        Class<?>[] argumentTypes = new Class[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            argumentTypes[i] = arguments[i].getClass();
+        }
+        throw new NoSuchMethodException("No method \"" + methodName + "(" + Arrays.toString(argumentTypes) + ")\" in hierarchy!");
     }
 
-    private boolean invokeNextMethod(String methodName, Object... arguments) {
+    private void addSuperClassesToQueue(Class<?>[] parents) {
+        for (Class<?> parent : parents) {
+            if (!classesQueue.contains(parent)) {
+                classesQueue.add(parent);
+            }
+        }
+    }
+
+    private Class<?>[] getParents(Class<?> c) {
+        if (c.getAnnotations().length == 0 ||
+                c.getAnnotation(Extends.class) == null ||
+                c.getAnnotation(Extends.class).parents() == null ||
+                c.getAnnotation(Extends.class).parents().length == 0) {
+            return null;
+        }
+        return c.getAnnotation(Extends.class).parents();
+    }
+
+    private boolean hasNextMethod(String methodName, Object... arguments) {
+        if (classesQueue.isEmpty()) {
+            return false;
+        }
+
+        Class<?> parent = classesQueue.peek();
+
+        Class<?>[] argumentTypes = new Class[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            argumentTypes[i] = arguments[i].getClass();
+        }
+
+        try {
+            parent.getMethod(methodName, argumentTypes);
+        } catch (NoSuchMethodException e) {
+            classesQueue.pop();
+
+            Class<?>[] parents = getParents(parent);
+            if (parents != null) {
+                addSuperClassesToQueue(parents);
+            }
+
+            return false;
+        }
+        return true;
+    }
+
+    private Object invokeNextMethod(String methodName, Object... arguments) {
         Class<?>[] argumentTypes = new Class[arguments.length];
         Class<?> parent = classesQueue.pop();
 
@@ -39,7 +93,7 @@ public class MIRoot {
         try {
             method = parent.getMethod(methodName, argumentTypes);
         } catch (NoSuchMethodException e) {
-            return false;
+            return null;
         }
 
         try {
@@ -47,13 +101,11 @@ public class MIRoot {
             Constructor<?> constructor;
             constructor = parent.getDeclaredConstructor();
             o = constructor.newInstance();
-            method.invoke(o, arguments);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            return method.invoke(o, arguments);
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             throw new RuntimeException();
         }
-
-        return true;
     }
-
 
 }
