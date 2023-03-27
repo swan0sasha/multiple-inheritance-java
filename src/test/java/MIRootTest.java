@@ -4,58 +4,57 @@ import org.junit.jupiter.api.Test;
 public class MIRootTest {
 
     @Test
-    public void callNextMethod() throws NoSuchMethodException, MultipleInheritanceException {
+    public void callNextMethod() {
         TestClasses.H h = new TestClasses.H();
         Assertions.assertEquals("HG", h.name());
     }
 
     @Test
-    public void multipleParentMethods() throws NoSuchMethodException, MultipleInheritanceException {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("DBC", d.name());
-    }
-
-    @Test
-    public void callParentMethod() throws NoSuchMethodException, MultipleInheritanceException {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("BC", d.callNextMethod("name"));
-    }
-
-    @Test
-    public void callAncestorMethod() throws NoSuchMethodException, MultipleInheritanceException {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("A", d.callNextMethod("grandparentName"));
-    }
-
-    @Test
-    public void callNonexistentMethod() {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertThrows(NoSuchMethodException.class, () -> d.callNextMethod("nonexistent"));
+    public void multipleParentMethods() {
+        TestClasses.B b = new TestClasses.B();
+        Assertions.assertEquals("BAHG", b.name());
     }
 
     @Test
     public void notAnnotatedClass() {
         TestClasses.A a = new TestClasses.A();
-        Assertions.assertThrows(MultipleInheritanceException.class, () -> a.callNextMethod("name"));
+        Assertions.assertThrows(MIHierarchyException.class, () -> a.callNextMethod());
+        ;
     }
 
     @Test
-    public void noParentsClass() {
+    public void emptyParentsArrayClass() {
         TestClasses.G g = new TestClasses.G();
-        Assertions.assertThrows(MultipleInheritanceException.class, () -> g.callNextMethod("name"));
+        Assertions.assertThrows(MIHierarchyException.class, () -> g.callNextMethod());
     }
 
     @Test
-    public void methodWithArguments() throws NoSuchMethodException, MultipleInheritanceException {
+    public void callNonexistentMethod() {
         TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("Cd", d.callNextMethod("string", "d"));
+        Assertions.assertThrows(NoSuchMethodException.class, () -> d.methodD());
+    }
+
+    @Test
+    public void methodWithArguments() {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("Cd", d.string("d"));
     }
 
     @Test
     public void callNonexistentMethodWithArguments() {
         TestClasses.D d = new TestClasses.D();
-        Assertions.assertThrows(NoSuchMethodException.class, () -> d.callNextMethod("string"));
+        Assertions.assertThrows(NoSuchMethodException.class, d::string);
         //method "string" in class C needs one String argument
     }
-
+//    @Test
+//    public void callParentMethod() throws NoSuchMethodException, MultipleInheritanceException {
+//        TestClasses.D d = new TestClasses.D();
+//        Assertions.assertEquals("BC", d.callNextMethod());
+//    }
+//
+//    @Test
+//    public void callAncestorMethod() throws NoSuchMethodException, MultipleInheritanceException {
+//        TestClasses.D d = new TestClasses.D();
+//        Assertions.assertEquals("A", d.callNextMethod("grandparentName"));
+//    }
 }

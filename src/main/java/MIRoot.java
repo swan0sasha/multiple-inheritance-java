@@ -15,14 +15,16 @@ public class MIRoot {
         }
     }
 
-    public Object callNextMethod(String methodName, Object... arguments) throws NoSuchMethodException, MultipleInheritanceException {
+    public Object callNextMethod(Object... arguments) throws NoSuchMethodException, MIHierarchyException {
+        String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
         Class<?>[] parents = getParents(this.getClass());
         if (parents == null) {
-            throw new MultipleInheritanceException("No parent class to call for next method.");
+            if (classesQueue.isEmpty()) {
+                throw new MIHierarchyException("No parent class to call for next method.");
+            }
+        } else {
+            addSuperClassesToQueue(parents);
         }
-
-        addSuperClassesToQueue(parents);
-
 
         while (!classesQueue.isEmpty()) {
             if (hasNextMethod(methodName, arguments)) {
@@ -73,7 +75,7 @@ public class MIRoot {
         Class<?>[] argumentTypes = getArgumentTypes(arguments);
 
         try {
-            parent.getMethod(methodName, argumentTypes);
+            parent.getDeclaredMethod(methodName, argumentTypes);
         } catch (NoSuchMethodException e) {
             classesQueue.pop();
 
@@ -93,16 +95,14 @@ public class MIRoot {
 
         Method method;
         try {
-            method = parent.getMethod(methodName, argumentTypes);
+            method = parent.getDeclaredMethod(methodName, argumentTypes);
         } catch (NoSuchMethodException e) {
             return null;
         }
 
         try {
-            Object o;
-            Constructor<?> constructor;
-            constructor = parent.getDeclaredConstructor();
-            o = constructor.newInstance();
+            Constructor<?> constructor = parent.getDeclaredConstructor();
+            Object o = constructor.newInstance();
             return method.invoke(o, arguments);
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
