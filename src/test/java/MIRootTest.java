@@ -18,13 +18,13 @@ public class MIRootTest {
     @Test
     public void notAnnotatedClass() {
         TestClasses.A a = new TestClasses.A();
-        Assertions.assertThrows(MIHierarchyException.class, a::callNextMethod);
+        Assertions.assertThrows(MIHierarchyException.class, a::name);
     }
 
     @Test
     public void emptyParentsArrayClass() {
         TestClasses.G g = new TestClasses.G();
-        Assertions.assertThrows(MIHierarchyException.class, g::callNextMethod);
+        Assertions.assertThrows(MIHierarchyException.class, g::parentName);
     }
 
     @Test

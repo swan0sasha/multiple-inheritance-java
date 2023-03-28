@@ -23,6 +23,7 @@ public class TestClasses {
         String parentName() throws MIHierarchyException, NoSuchMethodException {
             return (String) this.callNextMethod();
         }
+
         String grandparentName() throws MIHierarchyException, NoSuchMethodException {
             return (String) this.callNextMethod();
         }
@@ -34,11 +35,13 @@ public class TestClasses {
 
     public static class A extends Root {
         @Override
-        public String name() {
+        public String name() throws NoSuchMethodException, MIHierarchyException {
             try {
                 return "A".concat((String) this.callNextMethod());
-            } catch (NoSuchMethodException | MIHierarchyException e) {
-                throw new RuntimeException(e);
+            } catch (NoSuchMethodException  e) {
+                throw new NoSuchMethodException();
+            } catch (MIHierarchyException e) {
+                throw new MIHierarchyException();
             }
         }
 
@@ -52,6 +55,10 @@ public class TestClasses {
     public static class G extends Root {
         public String name() {
             return "G";
+        }
+
+        public String parentName() throws NoSuchMethodException, MIHierarchyException {
+            return (String) callNextMethod();
         }
     }
 
