@@ -18,20 +18,19 @@ public class MIRootTest {
     @Test
     public void notAnnotatedClass() {
         TestClasses.A a = new TestClasses.A();
-        Assertions.assertThrows(MIHierarchyException.class, () -> a.callNextMethod());
-        ;
+        Assertions.assertThrows(MIHierarchyException.class, a::callNextMethod);
     }
 
     @Test
     public void emptyParentsArrayClass() {
         TestClasses.G g = new TestClasses.G();
-        Assertions.assertThrows(MIHierarchyException.class, () -> g.callNextMethod());
+        Assertions.assertThrows(MIHierarchyException.class, g::callNextMethod);
     }
 
     @Test
     public void callNonexistentMethod() {
         TestClasses.D d = new TestClasses.D();
-        Assertions.assertThrows(NoSuchMethodException.class, () -> d.methodD());
+        Assertions.assertThrows(NoSuchMethodException.class, d::methodD);
     }
 
     @Test
@@ -46,15 +45,16 @@ public class MIRootTest {
         Assertions.assertThrows(NoSuchMethodException.class, d::string);
         //method "string" in class C needs one String argument
     }
-//    @Test
-//    public void callParentMethod() throws NoSuchMethodException, MultipleInheritanceException {
-//        TestClasses.D d = new TestClasses.D();
-//        Assertions.assertEquals("BC", d.callNextMethod());
-//    }
-//
-//    @Test
-//    public void callAncestorMethod() throws NoSuchMethodException, MultipleInheritanceException {
-//        TestClasses.D d = new TestClasses.D();
-//        Assertions.assertEquals("A", d.callNextMethod("grandparentName"));
-//    }
+
+    @Test
+    public void callParentMethod() throws NoSuchMethodException, MIHierarchyException {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("C", d.parentName());
+    }
+
+    @Test
+    public void callAncestorMethod() throws NoSuchMethodException, MIHierarchyException {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("A", d.grandparentName());
+    }
 }

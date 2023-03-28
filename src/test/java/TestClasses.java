@@ -15,19 +15,25 @@ public class TestClasses {
 
      */
 
-    public interface Root {
-        String name();
-
-        default String grandparentName() {
-            return "Default grandparentName";
+    public static class Root extends MIRoot {
+        String name() throws MIHierarchyException, NoSuchMethodException {
+            return (String) this.callNextMethod();
         }
 
-        default String string(String s) {
-            return ("Default" + s);
+        String parentName() throws MIHierarchyException, NoSuchMethodException {
+            return (String) this.callNextMethod();
+        }
+        String grandparentName() throws MIHierarchyException, NoSuchMethodException {
+            return (String) this.callNextMethod();
+        }
+
+        String string(String s) throws MIHierarchyException, NoSuchMethodException {
+            return (String) this.callNextMethod(s);
         }
     }
 
-    public static class A extends MIRoot implements Root {
+    public static class A extends Root {
+        @Override
         public String name() {
             try {
                 return "A".concat((String) this.callNextMethod());
@@ -36,20 +42,21 @@ public class TestClasses {
             }
         }
 
+        @Override
         public String grandparentName() {
             return "A";
         }
     }
 
     @Extends(parents = {})
-    public static class G extends MIRoot implements Root {
+    public static class G extends Root {
         public String name() {
             return "G";
         }
     }
 
     @Extends(parents = G.class)
-    public static class H extends MIRoot implements Root {
+    public static class H extends Root {
         public String name() {
             try {
                 return "H".concat((String) callNextMethod());
@@ -60,7 +67,7 @@ public class TestClasses {
     }
 
     @Extends(parents = {A.class, H.class})
-    public static class B extends MIRoot implements Root {
+    public static class B extends Root {
         public String name() {
             try {
                 return "B".concat((String) callNextMethod());
@@ -71,7 +78,7 @@ public class TestClasses {
     }
 
     @Extends(parents = H.class)
-    public static class C extends MIRoot implements Root {
+    public static class C extends Root {
         public String name() {
             return "C";
         }
@@ -79,10 +86,14 @@ public class TestClasses {
         public String string(String s) {
             return "C".concat(s);
         }
+
+        public String parentName() {
+            return "C";
+        }
     }
 
     @Extends(parents = {B.class, C.class})
-    public static class D extends MIRoot implements Root {
+    public static class D extends Root {
         public String name() {
             try {
                 return "D".concat((String) callNextMethod());
