@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.sound.midi.Soundbank;
+
 public class MIRootTest {
 
     @Test
@@ -13,6 +15,23 @@ public class MIRootTest {
     public void multipleParentMethods() {
         TestClasses.B b = new TestClasses.B();
         Assertions.assertEquals("BAHG", b.name());
+    }
+    @Test
+    public void methodWithArguments() {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("Cd", d.string("d"));
+    }
+
+    @Test
+    public void callParentMethod() throws NoSuchMethodException, MIHierarchyException {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("C", d.parentName());
+    }
+
+    @Test
+    public void callAncestorMethod() throws NoSuchMethodException, MIHierarchyException {
+        TestClasses.D d = new TestClasses.D();
+        Assertions.assertEquals("A", d.grandparentName());
     }
 
     @Test
@@ -34,27 +53,10 @@ public class MIRootTest {
     }
 
     @Test
-    public void methodWithArguments() {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("Cd", d.string("d"));
-    }
-
-    @Test
     public void callNonexistentMethodWithArguments() {
         TestClasses.D d = new TestClasses.D();
         Assertions.assertThrows(NoSuchMethodException.class, d::string);
         //method "string" in class C needs one String argument
     }
 
-    @Test
-    public void callParentMethod() throws NoSuchMethodException, MIHierarchyException {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("C", d.parentName());
-    }
-
-    @Test
-    public void callAncestorMethod() throws NoSuchMethodException, MIHierarchyException {
-        TestClasses.D d = new TestClasses.D();
-        Assertions.assertEquals("A", d.grandparentName());
-    }
 }

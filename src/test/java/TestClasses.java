@@ -125,4 +125,28 @@ public class TestClasses {
             return callNextMethod();
         }
     }
+
+
+    /*
+               G
+               |
+               |
+        A      H
+        |   /  |
+        |  /   |
+        B      C
+        \      /
+         \    /
+           D
+ */
+    public static void main(String[] args) throws MIHierarchyException, NoSuchMethodException {
+        D d = new D();
+        B b = new B();
+
+        System.out.println(b.name());                 //BAHG
+        System.out.println(d.name());                 //DBC
+        System.out.println(d.string("d"));         //Cd
+        System.out.println(d.grandparentName());     //A
+    }
+
 }
